@@ -126,9 +126,12 @@ public with sharing class DMLOperations {
      */
     public static void updateAccountFields(Id accountId, String newName, String newIndustry) {
         // Query the account
-        // [SELECT Id FROM Account WHERE Id = :accountId]
+        Account newAccount2 = [SELECT Id FROM Account WHERE Id = :accountId];
 
         // Update the Account with the given Id with the new name and industry
+        newAccount2.Name = newName;
+        newAccount2.Industry = newIndustry;
+        update newAccount2;
     }
 
 
@@ -141,11 +144,20 @@ public with sharing class DMLOperations {
      * @param list of Opportunities to be changed then upserted.
      */
     public static void upsertOpportunityList(List<Opportunity> opportunities) {
+
         // Loop through each Opportunity in the list
+        for (Opportunity opp : opportunities) {
             // Set the Opportunity's Stage to Qualification
+            opp.StageName = 'Qualification';
             // Set the Opportunity's Close Date to 3 months from today
+            opp.CloseDate = Date.today().addMonths(3);
             // Set the Opportunity's Amount to 50000
+            //*it is expecting an integer in the test class but the opportuntiy.amount field type is currency...?
+            opp.Amount = 50000;
+             
+        }
         // Upsert the opportunities List so that records are either updated or created
+        upsert opportunities;
     }
 
     /**
@@ -158,9 +170,23 @@ public with sharing class DMLOperations {
      * @param oppNames The list of Opportunity names.
      */
     public static void upsertOpportunities(String accountName, List<String> oppNames) {
+        /*
         // Loop through each Opportunity name
+        List<Opportunity> newOpportunityList = new List<Opportunity>();
+        for (String name : oppNames) {
             // Create an Opportunity with the given name
+            Opportunity newOpp = new Opportunity();
+            newOpp.Name = name;
+            newOpp.Account = accountName;
+
             // Add the Opportunity to the list
+            newOpportunityList.add(newOpp);
+
+        }
+
+        upsert newOpportunityList;
+        */
+            
     }
     
     /**
