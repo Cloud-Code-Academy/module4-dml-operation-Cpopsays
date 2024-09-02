@@ -181,6 +181,8 @@ public with sharing class DMLOperations {
 
             // Add the Opportunity to the list
             newOpportunityList.add(newOpp);
+            adding more comment
+            and another
 
         }
 
