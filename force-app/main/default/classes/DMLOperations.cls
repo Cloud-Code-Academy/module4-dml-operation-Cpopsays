@@ -181,10 +181,14 @@ public with sharing class DMLOperations {
         if (!accountsList.isEmpty()){
             singleAcct.Id = accountsList.get(0).Id;
         
+            } else {
+            singleAcct.Name = accountName;
+            insert singleAcct;
+        }
+        //check if opplist is empty if yes create opps
+        if (oppList.isEmpty()) {
             //loop through the oppnames. set acct id = above acct id
-            for (String name : oppNames) {
-                //how do I check if the list contains an element where element's name == name? 
-                //I tried adding an if statement and using list method contains(listElement) but the name is a string and the list element is an sobejct/opportunity object
+            for (String name : oppNames) {   
                 Opportunity newOpp = new Opportunity();
                 newOpp.Name = name;
                 newOpp.AccountId = singleAcct.Id;
@@ -192,28 +196,10 @@ public with sharing class DMLOperations {
                 newOpp.StageName = 'Prospecting';
                 system.debug(newOpp.Name);
                 oppList.add(newOpp);
-                
-
-
+                upsert oppList;
             }
-
-
-        } else {
-            singleAcct.Name = accountName;
-            insert singleAcct;
-
-            for (String name : oppNames) {
-                Opportunity newOpp = new Opportunity();
-                newOpp.Name = name;
-                newOpp.AccountId = singleAcct.Id;
-                newOpp.CloseDate = Date.today().addmonths(3);
-                newOpp.StageName = 'Prospecting';
-                oppList.add(newOpp);
-            }
-
         }
-        //outside for loop upsert the list of opps
-        upsert oppList;
+
     }
 
     
