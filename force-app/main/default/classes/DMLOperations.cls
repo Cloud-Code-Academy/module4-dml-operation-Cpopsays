@@ -283,11 +283,20 @@ public with sharing class DMLOperations {
      * @param leadNames The list of Lead names to be inserted.
      */
     public static void insertAndDeleteLeads(List<String> leadNames) {
+        //*create list to hold the leads
+        List<Lead> leadList = new List<Lead>();
         // Loop through each Lead name
-
+        for (String name : leadNames) {
+            Lead newLead = new Lead();
+            newLead.LastName = name;
+            newLead.Company = 'Popovich Industries';
+            leadList.add(newLead);
+        }
         // Insert the Leads
+        insert leadList;
 
         // Delete the Leads
+        delete leadList;
     }
 
 
@@ -298,8 +307,18 @@ public with sharing class DMLOperations {
      * @param numOfCases The number of cases to create.
      */
     public static void createAndDeleteCases(String accountId, Integer numOfCases) {
+        //*list to hold cases
+        List<Case> caseList = new List<Case>();
+        for (Integer x=0; x<numOfCases; x++) {
+            Case newCase = new Case();
+            newCase.AccountId = accountId;
+            caseList.add(newCase);
+
+        }
         // Insert the cases
+        insert caseList;
 
         // Delete the cases
+        delete caseList;
     }
 }
