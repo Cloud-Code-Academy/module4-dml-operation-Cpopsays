@@ -170,7 +170,7 @@ public with sharing class DMLOperations {
      * @param oppNames The list of Opportunity names.
      */
     public static void upsertOpportunities(String accountName, List<String> oppNames) {
-        //list of opps to upsert
+        //list of opps that have the same name as oppnames if any (need to check if empty or already exist)
         List<Opportunity> oppList = new List<Opportunity>([SELECT Id, Name FROM Opportunity WHERE Name = :oppNames]); 
         //find acct, limit one
         List<Account> accountsList = new List <Account>([SELECT Id FROM Account WHERE Name = :accountName LIMIT 1]);
@@ -232,8 +232,7 @@ public with sharing class DMLOperations {
             return newAcct;
             
         }
-        
-		
+
 	}
 
     /**
