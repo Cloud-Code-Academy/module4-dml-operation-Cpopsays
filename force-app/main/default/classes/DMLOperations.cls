@@ -170,26 +170,52 @@ public with sharing class DMLOperations {
      * @param oppNames The list of Opportunity names.
      */
     public static void upsertOpportunities(String accountName, List<String> oppNames) {
-        /*
-        // Loop through each Opportunity name
-        List<Opportunity> newOpportunityList = new List<Opportunity>();
-        for (String name : oppNames) {
-            // Create an Opportunity with the given name
-            Opportunity newOpp = new Opportunity();
-            newOpp.Name = name;
-            newOpp.Account = accountName;
+        //list of opps to upsert
+        List<Opportunity> oppList = new List<Opportunity>([SELECT Id, Name FROM Opportunity WHERE Name = :oppNames]); 
+        //find acct, limit one
+        List<Account> accountsList = new List <Account>([SELECT Id FROM Account WHERE Name = :accountName LIMIT 1]);
+        //create instance of an acct object?
+        Account singleAcct = new Account();
 
-            // Add the Opportunity to the list
-            newOpportunityList.add(newOpp);
-            adding more comment
-            and another
+        //if the list is not empty ie if it returns a result, save the whole record into an object variable?
+        if (!accountsList.isEmpty()){
+            singleAcct.Id = accountsList.get(0).Id;
+        
+            //loop through the oppnames. set acct id = above acct id
+            for (String name : oppNames) {
+                //how do I check if the list contains an element where element's name == name? 
+                //I tried adding an if statement and using list method contains(listElement) but the name is a string and the list element is an sobejct/opportunity object
+                Opportunity newOpp = new Opportunity();
+                newOpp.Name = name;
+                newOpp.AccountId = singleAcct.Id;
+                newOpp.CloseDate = Date.today().addmonths(3);
+                newOpp.StageName = 'Prospecting';
+                system.debug(newOpp.Name);
+                oppList.add(newOpp);
+                
+
+
+            }
+
+
+        } else {
+            singleAcct.Name = accountName;
+            insert singleAcct;
+
+            for (String name : oppNames) {
+                Opportunity newOpp = new Opportunity();
+                newOpp.Name = name;
+                newOpp.AccountId = singleAcct.Id;
+                newOpp.CloseDate = Date.today().addmonths(3);
+                newOpp.StageName = 'Prospecting';
+                oppList.add(newOpp);
+            }
 
         }
-
-        upsert newOpportunityList;
-        */
-            
+        //outside for loop upsert the list of opps
+        upsert oppList;
     }
+
     
     /**
      * Question 9
@@ -200,15 +226,28 @@ public with sharing class DMLOperations {
 	 * @return The Account that was upserted.
 	 */
 	public static Account upsertAccount(String accountName) {
-		// Query for the Account
-		List<Account> accounts = [SELECT Id FROM Account WHERE Name = :accountName];
-
+		//create new instance of acct obj
+        Account newAcct = new Account();
+        // Query for the Account
+		List<Account> accounts = [SELECT Id FROM Account WHERE Name = :accountName LIMIT 1];
 		// if the Account exists, update the description
-
-		// otherwise, create a new Account and set the description
-
-		// Upsert the Account
-		return null;
+        if (!accounts.isEmpty()){
+             newAcct = accounts.get(0);
+             newAcct.Description = 'Updated Account';
+             upsert newAcct;
+             return newAcct;  
+        
+        } else {
+            // otherwise, create a new Account and set the description
+            newAcct.Description = 'New Account';
+            newAcct.Name = accountName;
+		    // Upsert the Account
+            upsert newAcct;
+            return newAcct;
+            
+        }
+        
+		
 	}
 
     /**
